@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Survivor Finale Predictor</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght=600;800&family=Plus+Jakarta+Sans:wght=400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #0b0f19;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(244, 63, 94, 0.08) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(234, 179, 8, 0.05) 0px, transparent 50%),
+        radial-gradient(at 50% 100%, rgba(16, 185, 129, 0.05) 0px, transparent 50%);
+    }
+    .survivor-title {
+      font-family: 'Cinzel', serif;
+    }
+    /* Smooth drag and drop styles */
+    .juror-card {
+      transition: all 0.2s ease;
+      /* Mobile optimization: allow scrolling over items but keep them draggable */
+      touch-action: manipulation; 
+    }
+    .juror-card.dragging {
+      opacity: 0.5;
+      transform: scale(0.95);
+    }
+    .bucket {
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+    .bucket.drag-over {
+      background-color: rgba(234, 179, 8, 0.15) !important;
+      border-color: #eab308 !important;
+    }
+    /* Hidden textarea for copying */
+    #copy-temp {
+      position: absolute;
+      left: -9999px;
+      top: -9999px;
+    }
+  </style>
+</head>
+<body class="text-slate-100 min-h-screen py-6 px-3 sm:px-6">
+
+  <div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <header class="text-center mb-8">
+      <div class="inline-block bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-3">
+        Season Finale Ballot
+      </div>
+      <h1 class="text-3xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500 survivor-title tracking-wider mb-2">
+        SURVIVOR FINALE
+      </h1>
+      <p class="text-slate-400 text-xs sm:text-base max-w-lg mx-auto">
+        Lock in your Final 3 placements and align the jury for the ultimate tiebreaker.
+      </p>
+    </header>
+
+    <!-- Main Content Grid -->
+    <div class="space-y-6 sm:space-y-8">
+
+      <!-- Step 1: Placements -->
+      <section class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-xl backdrop-blur-sm">
+        <div class="flex items-center gap-3 mb-5">
+          <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-amber-500 text-slate-950 font-bold text-sm">1</span>
+          <h2 class="text-lg sm:text-xl font-bold tracking-tight">Select the Final 3</h2>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6" id="placement-group">
+          <!-- 1st -->
+          <div class="bg-slate-950/50 p-4 rounded-xl border border-slate-800/80 flex flex-col justify-between">
+            <label class="block text-xs font-bold text-amber-400 uppercase tracking-wider mb-2">1st Place (Sole)</label>
+            <select id="place-1" onchange="updatePlacements()" class="w-full bg-slate-900 border border-slate-700 rounded-lg py-3 sm:py-2 px-3 text-sm text-white focus:outline-none focus:border-amber-500 transition">
+              <option value="" disabled selected class="bg-slate-900 text-slate-400">Select Player...</option>
+              <option value="Aubry" class="bg-slate-900 text-white">Aubry</option>
+              <option value="Jonathan" class="bg-slate-900 text-white">Jonathan</option>
+              <option value="Joe" class="bg-slate-900 text-white">Joe</option>
+              <option value="Rizo" class="bg-slate-900 text-white">Rizo</option>
+              <option value="Tiffany" class="bg-slate-900 text-white">Tiffany</option>
+            </select>
+          </div>
+          <!-- 2nd -->
+          <div class="bg-slate-950/50 p-4 rounded-xl border border-slate-800/80 flex flex-col justify-between">
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">2nd Place</label>
+            <select id="place-2" onchange="updatePlacements()" class="w-full bg-slate-900 border border-slate-700 rounded-lg py-3 sm:py-2 px-3 text-sm text-white focus:outline-none focus:border-amber-500 transition">
+              <option value="" disabled selected class="bg-slate-900 text-slate-400">Select Player...</option>
+              <option value="Aubry" class="bg-slate-900 text-white">Aubry</option>
+              <option value="Jonathan" class="bg-slate-900 text-white">Jonathan</option>
+              <option value="Joe" class="bg-slate-900 text-white">Joe</option>
+              <option value="Rizo" class="bg-slate-900 text-white">Rizo</option>
+              <option value="Tiffany" class="bg-slate-900 text-white">Tiffany</option>
+            </select>
+          </div>
+          <!-- 3rd -->
+          <div class="bg-slate-950/50 p-4 rounded-xl border border-slate-800/80 flex flex-col justify-between">
+            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">3rd Place</label>
+            <select id="place-3" onchange="updatePlacements()" class="w-full bg-slate-900 border border-slate-700 rounded-lg py-3 sm:py-2 px-3 text-sm text-white focus:outline-none focus:border-amber-500 transition">
+              <option value="" disabled selected class="bg-slate-900 text-slate-400">Select Player...</option>
+              <option value="Aubry" class="bg-slate-900 text-white">Aubry</option>
+              <option value="Jonathan" class="bg-slate-900 text-white">Jonathan</option>
+              <option value="Joe" class="bg-slate-900 text-white">Joe</option>
+              <option value="Rizo" class="bg-slate-900 text-white">Rizo</option>
+              <option value="Tiffany" class="bg-slate-900 text-white">Tiffany</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 2: Jury Tiebreaker -->
+      <section class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-xl backdrop-blur-sm">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-amber-500 text-slate-950 font-bold text-sm">2</span>
+          <h2 class="text-lg sm:text-xl font-bold tracking-tight">The Jury Vote Ballot</h2>
+        </div>
+
+        <p class="text-xs text-slate-400 mb-6 bg-slate-950/40 p-3 rounded-lg border border-slate-800/60 leading-relaxed">
+          🎯 Drag jurors from the pool below into each finalist's column. 
+          <span class="text-amber-400 font-medium">On Mobile?</span> Simply tap a juror to highlight them, then tap any column to place them!
+        </p>
+
+        <!-- Tap-to-move UI Status indicator (mainly for accessibility/mobile) -->
+        <div id="selection-status" class="hidden text-xs font-medium text-amber-400 bg-amber-500/10 border border-amber-500/20 px-3 py-2.5 rounded-lg mb-4 flex items-center justify-between">
+          <span id="status-text">Selected Juror: None</span>
+          <button onclick="clearActiveSelection()" class="text-xs font-bold underline hover:text-white px-2 py-1">Cancel</button>
+        </div>
+
+        <!-- Dynamic Final 3 Columns -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-6">
+          
+          <!-- Column 1 (1st Place Guess) -->
+          <div class="bg-slate-950/40 border border-slate-800 rounded-xl p-3 sm:p-4 flex flex-col min-h-[160px]">
+            <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-800">
+              <span class="text-xs font-bold text-amber-400 uppercase tracking-wider">Finalist 1</span>
+              <span id="count-f1" class="bg-amber-500/20 text-amber-400 text-xs px-2 py-0.5 rounded-full font-bold">0 Votes</span>
+            </div>
+            <div class="flex items-center gap-3 mb-3">
+              <img id="img-f1" src="" class="w-10 h-10 rounded-full border-2 border-amber-500 object-cover bg-slate-800" alt="Finalist 1">
+              <div class="text-base sm:text-lg font-bold text-white" id="name-f1">Finalist 1</div>
+            </div>
+            <div id="bucket-f1" class="bucket flex-grow rounded-lg border border-dashed border-slate-700 p-2 min-h-[90px] flex flex-wrap gap-2 content-start" ondragover="allowDrop(event)" ondrop="drop(event, 'f1')" onclick="onBucketClick('f1')">
+              <!-- Juror items dropped here -->
+            </div>
+          </div>
+
+          <!-- Column 2 (2nd Place Guess) -->
+          <div class="bg-slate-950/40 border border-slate-800 rounded-xl p-3 sm:p-4 flex flex-col min-h-[160px]">
+            <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-800">
+              <span class="text-xs font-bold text-slate-300 uppercase tracking-wider">Finalist 2</span>
+              <span id="count-f2" class="bg-slate-700/30 text-slate-300 text-xs px-2 py-0.5 rounded-full font-bold">0 Votes</span>
+            </div>
+            <div class="flex items-center gap-3 mb-3">
+              <img id="img-f2" src="" class="w-10 h-10 rounded-full border-2 border-slate-400 object-cover bg-slate-800" alt="Finalist 2">
+              <div class="text-base sm:text-lg font-bold text-white" id="name-f2">Finalist 2</div>
+            </div>
+            <div id="bucket-f2" class="bucket flex-grow rounded-lg border border-dashed border-slate-700 p-2 min-h-[90px] flex flex-wrap gap-2 content-start" ondragover="allowDrop(event)" ondrop="drop(event, 'f2')" onclick="onBucketClick('f2')">
+              <!-- Juror items dropped here -->
+            </div>
+          </div>
+
+          <!-- Column 3 (3rd Place Guess) -->
+          <div class="bg-slate-950/40 border border-slate-800 rounded-xl p-3 sm:p-4 flex flex-col min-h-[160px]">
+            <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-800">
+              <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Finalist 3</span>
+              <span id="count-f3" class="bg-slate-700/30 text-slate-400 text-xs px-2 py-0.5 rounded-full font-bold">0 Votes</span>
+            </div>
+            <div class="flex items-center gap-3 mb-3">
+              <img id="img-f3" src="" class="w-10 h-10 rounded-full border-2 border-slate-500 object-cover bg-slate-800" alt="Finalist 3">
+              <div class="text-base sm:text-lg font-bold text-white" id="name-f3">Finalist 3</div>
+            </div>
+            <div id="bucket-f3" class="bucket flex-grow rounded-lg border border-dashed border-slate-700 p-2 min-h-[90px] flex flex-wrap gap-2 content-start" ondragover="allowDrop(event)" ondrop="drop(event, 'f3')" onclick="onBucketClick('f3')">
+              <!-- Juror items dropped here -->
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Juror Pool Container -->
+        <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-3 sm:p-4" onclick="onBucketClick('pool')">
+          <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Unassigned Juror Pool</div>
+          <div id="juror-pool" class="flex flex-wrap gap-2 sm:gap-3 min-h-[70px] p-1">
+            
+            <!-- All 9 Actual Jurors -->
+            <div id="juror-1" draggable="true" ondragstart="drag(event)" onclick="onJurorClick(event, 'juror-1')" class="juror-card bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs text-slate-100 pr-3 pl-1 py-1 rounded-full cursor-grab active:cursor-grabbing select-none shadow flex items-center gap-2">
+              <img src="https://static.wikia.nocookie.net/survivor/images/d/d6/S50_dee_t.png/revision/latest/scale-to-width-down/70?cb=20260131164217" class="w-8 h-8 rounded-full object-cover">
+              <span class="font-medium juror-name">Dee</span>
+            </div>
+            
+            <div id="juror-2" draggable="true" ondragstart="drag(event)" onclick="onJurorClick(event, 'juror-2')" class="juror-card bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs text-slate-100 pr-3 pl-1 py-1 rounded-full cursor-grab active:cursor-grabbing select-none shadow flex items-center gap-2">
+              <img src="https://static.wikia.nocookie.net/survivor/images/4/40/S50_chrissy_t.png/revision/latest/scale-to-width-down/70?cb=20260131164203" class="w-8 h-8 rounded-full object-cover">
+              <span class="font-medium juror-name">Chrissy</span>
+            </div>
+            
+            <div id="juror-3" draggable="true" ondragstart="drag(event)" onclick="onJurorClick(event, 'juror-3')" class="juror-card bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs text-slate-100 pr-3 pl-1 py-1 rounded-full cursor-grab active:cursor-grabbing select-none shadow flex items-center gap-2">
+              <img src="https://static.wikia.nocookie.net/survivor/images/2/22/S50_coach_t.png/revision/latest/scale-to-width-down/70?cb=20260131164211" class="w-8 h-8 rounded-full object-cover">
+              <span class="font-medium juror-name">Coach</span>
+            </div>
+            
+            <div id="juror-4" draggable="true" ondragstart="drag(event)" onclick="onJurorClick(event, 'juror-4')" class="juror-card bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs text-slate-100 pr-3 pl-1 py-1 rounded-full cursor-grab active:cursor-grabbing select-none shadow flex items-center gap-2">
+              <img src="https://static.wikia.nocookie.net/survivor/images/0/0a/S50_christian_t.png/revision/latest/scale-to-width-down/70?cb=20260131164205" class="w-8 h-8 rounded-full object-cover">
+              <span class="font-medium juror-name">Christian</span>
+            </div>
+            
+            <div id="juror-5" draggable="true" ondragstart="drag(event)" onclick="onJurorClick(event, 'juror-5')" class="juror-card bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs text-slate-100 pr-3 pl-1 py-1 rounded-full cursor-grab active:cursor-grabbing select-none shadow flex items-center gap-2">
+              <img src="https://static.wikia.nocookie.net/survivor/images/f/f7/S50_stephenie_t.png/revision/latest/scale-to-width-down/70?cb=20260131164259" class="w-8 h-8 rounded-full object-cover">
+              <span class="font-medium juror-name">Stephenie</span>
+            </div>
+            
+            <div id="juror-6" draggable="true" ondragstart="drag(event)" onclick="onJurorClick(event, 'juror-6')" class="juror-card bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs text-slate-100 pr-3 pl-1 py-1 rounded-full cursor-grab active:cursor-grabbing select-none shadow flex items-center gap-2">
+              <img src="https://static.wikia.nocookie.net/survivor/images/3/32/S50_emily_t.png/revision/latest/scale-to-width-down/70?cb=20260131164220" class="w-8 h-8 rounded-full object-cover">
+              <span class="font-medium juror-name">Emily</span>
+            </div>
+            
+            <div id="juror-7" draggable="true" ondragstart="drag(event)" onclick="onJurorClick(event, 'juror-7')" class="juror-card bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs text-slate-100 pr-3 pl-1 py-1 rounded-full cursor-grab active:cursor-grabbing select-none shadow flex items-center gap-2">
+              <img src="https://static.wikia.nocookie.net/survivor/images/7/7b/S50_ozzy_t.png/revision/latest/scale-to-width-down/70?cb=20260131164244" class="w-8 h-8 rounded-full object-cover">
+              <span class="font-medium juror-name">Ozzy</span>
+            </div>
+            
+            <div id="juror-8" draggable="true" ondragstart="drag(event)" onclick="onJurorClick(event, 'juror-8')" class="juror-card bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs text-slate-100 pr-3 pl-1 py-1 rounded-full cursor-grab active:cursor-grabbing select-none shadow flex items-center gap-2">
+              <img src="https://static.wikia.nocookie.net/survivor/images/8/83/S50_rick_t.png/revision/latest/scale-to-width-down/70?cb=20260131164250" class="w-8 h-8 rounded-full object-cover">
+              <span class="font-medium juror-name">Rick</span>
+            </div>
+
+            <div id="juror-9" draggable="true" ondragstart="drag(event)" onclick="onJurorClick(event, 'juror-9')" class="juror-card bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs text-slate-100 pr-3 pl-1 py-1 rounded-full cursor-grab active:cursor-grabbing select-none shadow flex items-center gap-2">
+              <img src="https://static.wikia.nocookie.net/survivor/images/f/f7/S50_cirie_t.png/revision/latest/scale-to-width-down/70?cb=20260131164208" class="w-8 h-8 rounded-full object-cover">
+              <span class="font-medium juror-name">Cirie</span>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 3: Submission Panel -->
+      <section class="text-center bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-rose-500/10 border border-amber-500/30 rounded-2xl p-6 sm:p-8 shadow-xl">
+        <h3 class="text-base sm:text-lg font-bold text-amber-400 mb-2">Ready to Send Your Predictions?</h3>
+        <p class="text-xs text-slate-300 max-w-md mx-auto mb-5 sm:mb-6 leading-relaxed">
+          Clicking the button below copies your final ballot to your clipboard so you can easily drop it in your chat.
+        </p>
+
+        <button onclick="copyPredictions()" class="w-full sm:w-auto bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950 font-bold tracking-wide px-8 py-4 sm:py-3.5 rounded-xl hover:from-amber-400 hover:to-orange-500 focus:outline-none focus:ring-2 focus:ring-amber-400 shadow-lg shadow-orange-950/30 hover:shadow-orange-950/50 transition transform active:scale-95 text-sm uppercase">
+          Copy Format to Clipboard
+        </button>
+      </section>
+
+    </div>
+
+    <!-- Live Toast Message Custom System -->
+    <div id="toast-message" class="fixed bottom-6 left-1/2 -translate-x-1/2 sm:translate-x-0 sm:left-auto sm:right-6 z-50 bg-emerald-500 text-slate-950 px-5 sm:px-6 py-3 sm:py-4 rounded-xl shadow-2xl font-semibold border border-emerald-400 flex items-center gap-3 transform translate-y-20 opacity-0 transition-all duration-300 ease-out w-[90%] sm:w-auto">
+      <span class="text-xl">✅</span>
+      <div>
+        <h4 class="font-bold text-sm">Copied to Clipboard!</h4>
+        <p class="text-[11px] font-medium text-slate-900">Paste it directly into your chat.</p>
+      </div>
+    </div>
+
+    <!-- Hidden Input for Copy Hack -->
+    <textarea id="copy-temp" readonly></textarea>
+
+    <!-- Footer copyright info -->
+    <footer class="text-center text-slate-600 text-xs mt-10 sm:mt-12 py-4">
+      Created for Survivor Finale Pools | Drag, drop, and conquer.
+    </footer>
+  </div>
+
+  <script>
+    // Variables to track active click states (for touch screen devices)
+    let selectedJurorId = null;
+
+    // Actual Final 5 Player Image Dictionary 
+    const playerImages = {
+      "Aubry": "https://static.wikia.nocookie.net/survivor/images/8/82/S50_aubry_t.png/revision/latest/scale-to-width-down/70?cb=20260131164157",
+      "Jonathan": "https://static.wikia.nocookie.net/survivor/images/e/ea/S50_jonathan_t.png/revision/latest/scale-to-width-down/70?cb=20260131164232",
+      "Joe": "https://static.wikia.nocookie.net/survivor/images/5/59/S50_joe_t.png/revision/latest/scale-to-width-down/70?cb=20260131164229",
+      "Rizo": "https://static.wikia.nocookie.net/survivor/images/7/78/S50_rizo_t.png/revision/latest/scale-to-width-down/70?cb=20260131164253",
+      "Tiffany": "https://static.wikia.nocookie.net/survivor/images/8/83/S50_tiffany_t.png/revision/latest/scale-to-width-down/70?cb=20260131164303"
+    };
+
+    // Generic neutral placeholder image
+    const placeholderImg = "https://ui-avatars.com/api/?name=%3F&background=475569&color=fff";
+
+    // Run automatically on page load to sync names to the tiebreaker sections
+    window.onload = function() {
+      updatePlacements();
+      setupDragAndDrop();
+    };
+
+    // Keep placements and jury box headers synchronized dynamically
+    function updatePlacements() {
+      const p1 = document.getElementById('place-1').value;
+      const p2 = document.getElementById('place-2').value;
+      const p3 = document.getElementById('place-3').value;
+
+      // Update jury headers and images
+      document.getElementById('name-f1').innerText = p1 || "Finalist 1";
+      document.getElementById('img-f1').src = p1 ? playerImages[p1] : placeholderImg;
+      
+      document.getElementById('name-f2').innerText = p2 || "Finalist 2";
+      document.getElementById('img-f2').src = p2 ? playerImages[p2] : placeholderImg;
+
+      document.getElementById('name-f3').innerText = p3 || "Finalist 3";
+      document.getElementById('img-f3').src = p3 ? playerImages[p3] : placeholderImg;
+    }
+
+    // Set up standard HTML5 Drag & Drop event bindings
+    function setupDragAndDrop() {
+      const buckets = document.querySelectorAll('.bucket');
+      buckets.forEach(bucket => {
+        bucket.addEventListener('dragenter', (e) => {
+          e.preventDefault();
+          bucket.classList.add('drag-over');
+        });
+        bucket.addEventListener('dragleave', () => {
+          bucket.classList.remove('drag-over');
+        });
+        bucket.addEventListener('dragover', (e) => {
+          e.preventDefault();
+        });
+      });
+    }
+
+    // Standard drag start handling
+    function drag(ev) {
+      ev.dataTransfer.setData("text", ev.currentTarget.id);
+      ev.currentTarget.classList.add('dragging');
+    }
+
+    function allowDrop(ev) {
+      ev.preventDefault();
+    }
+
+    // Dropping element inside target containers
+    function drop(ev, bucketType) {
+      ev.preventDefault();
+      const id = ev.dataTransfer.getData("text");
+      const draggedEl = document.getElementById(id);
+      if(draggedEl) draggedEl.classList.remove('dragging');
+      
+      // Determine destination container
+      let targetContainer = null;
+      if (bucketType === 'f1') targetContainer = document.getElementById('bucket-f1');
+      if (bucketType === 'f2') targetContainer = document.getElementById('bucket-f2');
+      if (bucketType === 'f3') targetContainer = document.getElementById('bucket-f3');
+      
+      if (targetContainer && draggedEl) {
+        targetContainer.appendChild(draggedEl);
+        document.querySelectorAll('.bucket').forEach(b => b.classList.remove('drag-over'));
+        updateVoteCounts();
+      }
+    }
+
+    // Click/Touch-to-Move fallback controls
+    function onJurorClick(event, jurorId) {
+      event.stopPropagation(); // Avoid triggering container clicks
+      
+      const previouslySelected = document.getElementById(selectedJurorId);
+      if (previouslySelected) {
+        previouslySelected.classList.remove('ring-4', 'ring-amber-400', 'border-amber-400');
+      }
+
+      if (selectedJurorId === jurorId) {
+        // Toggle off if clicking the same juror twice
+        clearActiveSelection();
+        return;
+      }
+
+      selectedJurorId = jurorId;
+      const currentJuror = document.getElementById(jurorId);
+      currentJuror.classList.add('ring-4', 'ring-amber-400', 'border-amber-400');
+
+      const nameSpan = currentJuror.querySelector('.juror-name');
+      const text = nameSpan ? nameSpan.innerText.trim() : "Juror";
+      
+      document.getElementById('status-text').innerText = "Selected: " + text;
+      document.getElementById('selection-status').classList.remove('hidden');
+    }
+
+    function onBucketClick(bucketType) {
+      if (!selectedJurorId) return;
+
+      const jurorElement = document.getElementById(selectedJurorId);
+      let targetContainer;
+
+      if (bucketType === 'f1') targetContainer = document.getElementById('bucket-f1');
+      else if (bucketType === 'f2') targetContainer = document.getElementById('bucket-f2');
+      else if (bucketType === 'f3') targetContainer = document.getElementById('bucket-f3');
+      else if (bucketType === 'pool') targetContainer = document.getElementById('juror-pool');
+
+      if (targetContainer && jurorElement) {
+        targetContainer.appendChild(jurorElement);
+        clearActiveSelection();
+        updateVoteCounts();
+      }
+    }
+
+    function clearActiveSelection() {
+      if (selectedJurorId) {
+        const selected = document.getElementById(selectedJurorId);
+        if (selected) {
+          selected.classList.remove('ring-4', 'ring-amber-400', 'border-amber-400');
+        }
+      }
+      selectedJurorId = null;
+      document.getElementById('selection-status').classList.add('hidden');
+    }
+
+    // Dynamic vote counter updates for the bucket labels
+    function updateVoteCounts() {
+      const f1Votes = document.getElementById('bucket-f1').children.length;
+      const f2Votes = document.getElementById('bucket-f2').children.length;
+      const f3Votes = document.getElementById('bucket-f3').children.length;
+
+      document.getElementById('count-f1').innerText = f1Votes + " Vote" + (f1Votes !== 1 ? "s" : "");
+      document.getElementById('count-f2').innerText = f2Votes + " Vote" + (f2Votes !== 1 ? "s" : "");
+      document.getElementById('count-f3').innerText = f3Votes + " Vote" + (f3Votes !== 1 ? "s" : "");
+    }
+
+    // Helper functions to get lists of jurors assigned to a bucket
+    function getJurorsInBucket(bucketId) {
+      const bucket = document.getElementById(bucketId);
+      const items = [];
+      for (let i = 0; i < bucket.children.length; i++) {
+        const nameSpan = bucket.children[i].querySelector('.juror-name');
+        if(nameSpan) {
+          items.push(nameSpan.innerText.trim());
+        }
+      }
+      return items.length > 0 ? items.join(', ') : 'None';
+    }
+
+    // Create summary text block and invoke custom toast notifications
+    function copyPredictions() {
+      const p1 = document.getElementById('place-1').value || "Finalist 1";
+      const p2 = document.getElementById('place-2').value || "Finalist 2";
+      const p3 = document.getElementById('place-3').value || "Finalist 3";
+
+      // Extract jury allocation lists
+      const f1VotesList = getJurorsInBucket('bucket-f1');
+      const f2VotesList = getJurorsInBucket('bucket-f2');
+      const f3VotesList = getJurorsInBucket('bucket-f3');
+
+      // Tally lengths
+      const f1Count = document.getElementById('bucket-f1').children.length;
+      const f2Count = document.getElementById('bucket-f2').children.length;
+      const f3Count = document.getElementById('bucket-f3').children.length;
+
+      // Format clean output
+      const rawTextOutput = `🗳️ TIEBREAKER JURY BALLOT:
+* ${p1}: ${f1Count} votes (${f1VotesList})
+* ${p2}: ${f2Count} votes (${f2VotesList})
+* ${p3}: ${f3Count} votes (${f3VotesList})`;
+
+      // Execute hidden copy hack for iframe security compatibility
+      const copyBox = document.getElementById('copy-temp');
+      copyBox.value = rawTextOutput;
+      copyBox.select();
+      copyBox.setSelectionRange(0, 99999); // Mobile compatibility constraint
+
+      try {
+        document.execCommand('copy');
+        triggerToast();
+      } catch (err) {
+        console.error("Failed to copy using fallback strategy", err);
+      }
+    }
+
+    // Smooth entry toast animator (replacing standard browser alert blocks)
+    function triggerToast() {
+      const toast = document.getElementById('toast-message');
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 4000);
+    }
+  </script>
+
+</body>
+</html>
