@@ -187,7 +187,7 @@
           <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Unassigned Juror Pool</div>
           <div id="juror-pool" class="flex flex-wrap gap-2 sm:gap-3 min-h-[70px] p-1">
             
-            <!-- All 9 Actual Jurors -->
+            <!-- All 9 Base Jurors -->
             <div id="juror-1" draggable="true" ondragstart="drag(event)" onclick="onJurorClick(event, 'juror-1')" class="juror-card bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs text-slate-100 pr-3 pl-1 py-1 rounded-full cursor-grab active:cursor-grabbing select-none shadow flex items-center gap-2">
               <img src="https://static.wikia.nocookie.net/survivor/images/d/d6/S50_dee_t.png/revision/latest/scale-to-width-down/70?cb=20260131164217" class="w-8 h-8 rounded-full object-cover">
               <span class="font-medium juror-name">Dee</span>
@@ -231,6 +231,32 @@
             <div id="juror-9" draggable="true" ondragstart="drag(event)" onclick="onJurorClick(event, 'juror-9')" class="juror-card bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs text-slate-100 pr-3 pl-1 py-1 rounded-full cursor-grab active:cursor-grabbing select-none shadow flex items-center gap-2">
               <img src="https://static.wikia.nocookie.net/survivor/images/f/f7/S50_cirie_t.png/revision/latest/scale-to-width-down/70?cb=20260131164208" class="w-8 h-8 rounded-full object-cover">
               <span class="font-medium juror-name">Cirie</span>
+            </div>
+
+            <!-- DYNAMIC CANDIDATE JURORS (Automatically revealed as 4th/5th place voters) -->
+            <div id="juror-cand-Aubry" draggable="true" ondragstart="drag(event)" onclick="onJurorClick(event, 'juror-cand-Aubry')" class="juror-card hidden bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs text-slate-100 pr-3 pl-1 py-1 rounded-full cursor-grab active:cursor-grabbing select-none shadow flex items-center gap-2">
+              <img src="https://static.wikia.nocookie.net/survivor/images/8/82/S50_aubry_t.png/revision/latest/scale-to-width-down/70?cb=20260131164157" class="w-8 h-8 rounded-full object-cover">
+              <span class="font-medium juror-name">Aubry</span>
+            </div>
+
+            <div id="juror-cand-Jonathan" draggable="true" ondragstart="drag(event)" onclick="onJurorClick(event, 'juror-cand-Jonathan')" class="juror-card hidden bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs text-slate-100 pr-3 pl-1 py-1 rounded-full cursor-grab active:cursor-grabbing select-none shadow flex items-center gap-2">
+              <img src="https://static.wikia.nocookie.net/survivor/images/e/ea/S50_jonathan_t.png/revision/latest/scale-to-width-down/70?cb=20260131164232" class="w-8 h-8 rounded-full object-cover">
+              <span class="font-medium juror-name">Jonathan</span>
+            </div>
+
+            <div id="juror-cand-Joe" draggable="true" ondragstart="drag(event)" onclick="onJurorClick(event, 'juror-cand-Joe')" class="juror-card hidden bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs text-slate-100 pr-3 pl-1 py-1 rounded-full cursor-grab active:cursor-grabbing select-none shadow flex items-center gap-2">
+              <img src="https://static.wikia.nocookie.net/survivor/images/5/59/S50_joe_t.png/revision/latest/scale-to-width-down/70?cb=20260131164229" class="w-8 h-8 rounded-full object-cover">
+              <span class="font-medium juror-name">Joe</span>
+            </div>
+
+            <div id="juror-cand-Rizo" draggable="true" ondragstart="drag(event)" onclick="onJurorClick(event, 'juror-cand-Rizo')" class="juror-card hidden bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs text-slate-100 pr-3 pl-1 py-1 rounded-full cursor-grab active:cursor-grabbing select-none shadow flex items-center gap-2">
+              <img src="https://static.wikia.nocookie.net/survivor/images/7/78/S50_rizo_t.png/revision/latest/scale-to-width-down/70?cb=20260131164253" class="w-8 h-8 rounded-full object-cover">
+              <span class="font-medium juror-name">Rizo</span>
+            </div>
+
+            <div id="juror-cand-Tiffany" draggable="true" ondragstart="drag(event)" onclick="onJurorClick(event, 'juror-cand-Tiffany')" class="juror-card hidden bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs text-slate-100 pr-3 pl-1 py-1 rounded-full cursor-grab active:cursor-grabbing select-none shadow flex items-center gap-2">
+              <img src="https://static.wikia.nocookie.net/survivor/images/8/83/S50_tiffany_t.png/revision/latest/scale-to-width-down/70?cb=20260131164303" class="w-8 h-8 rounded-full object-cover">
+              <span class="font-medium juror-name">Tiffany</span>
             </div>
 
           </div>
@@ -306,6 +332,35 @@
 
       document.getElementById('name-f3').innerText = p3 || "Finalist 3";
       document.getElementById('img-f3').src = p3 ? playerImages[p3] : placeholderImg;
+
+      // Dynamic 4th/5th place voter processing logic
+      const candidates = ["Aubry", "Jonathan", "Joe", "Rizo", "Tiffany"];
+      const activeFinalists = [p1, p2, p3].filter(Boolean);
+
+      candidates.forEach(name => {
+        const card = document.getElementById(`juror-cand-${name}`);
+        if (!card) return;
+
+        if (activeFinalists.includes(name)) {
+          // This player is in the Final 3, so they are not a juror. Hide them!
+          card.classList.add('hidden');
+          
+          // Clean active mobile selections if they were focused on this card
+          if (selectedJurorId === `juror-cand-${name}`) {
+            clearActiveSelection();
+          }
+
+          // If the card was previously dragged into a bucket, return it to the pool
+          const pool = document.getElementById('juror-pool');
+          pool.appendChild(card);
+        } else {
+          // Player is unselected in the Final 3, meaning they are 4th/5th place. Show them as a juror!
+          card.classList.remove('hidden');
+        }
+      });
+
+      // Recalculate ballot counts instantly
+      updateVoteCounts();
     }
 
     // Set up standard HTML5 Drag & Drop event bindings
@@ -399,6 +454,7 @@
       }
     }
 
+    // Cancel active mobile tapping selection
     function clearActiveSelection() {
       if (selectedJurorId) {
         const selected = document.getElementById(selectedJurorId);
